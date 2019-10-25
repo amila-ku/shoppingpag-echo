@@ -1,0 +1,129 @@
+basePath: /api/v1
+definitions:
+  entity.APIError:
+    properties:
+      errorCode:
+        type: integer
+      errorMessage:
+        type: string
+    type: object
+  entity.Item:
+    properties:
+      id:
+        type: string
+      manufacturer:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      rating:
+        type: string
+      source:
+        type: Source
+      summary:
+        type: string
+    type: object
+host: localhost:10000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: ShoppingPal API
+  version: "1.0"
+paths:
+  /items:
+    get:
+      consumes:
+      - application/json
+      description: get Items
+      parameters:
+      - description: name search by q
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Token:
+              description: qwerty
+              type: string
+          schema:
+            items:
+              $ref: '#/definitions/entity.Item'
+            type: array
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/entity.APIError'
+            type: object
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/entity.APIError'
+            type: object
+      summary: List Items
+  /items/:
+    post:
+      consumes:
+      - application/json
+      description: add an item
+      operationId: get-string-by-int
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Token:
+              description: qwerty
+              type: string
+          schema:
+            $ref: '#/definitions/entity.Item'
+            type: object
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/entity.APIError'
+            type: object
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/entity.APIError'
+            type: object
+        "500":
+          description: We had a problem
+          schema:
+            $ref: '#/definitions/entity.APIError'
+            type: object
+      summary: Add an Item
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+  OAuth2Application:
+    flow: application
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      write: ' Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+swagger: "2.0"
