@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	// blank import is for adding swagger docs
-	_ "github.com/amila-ku/shoppingpal/api/docs"
-	"github.com/amila-ku/shoppingpal/pkg/entity"
+	_ "github.com/amila-ku/shoppingpal-echo/api/docs"
+	"github.com/amila-ku/shoppingpal-echo/pkg/entity"
 	store "github.com/amila-ku/shoppingpal/pkg/store"
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
 	swagger "github.com/swaggo/http-swagger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -20,14 +20,15 @@ import (
 var ItemList = entity.NewItems()
 
 // Home page handler
-func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the HomePage!")
-	fmt.Println("Endpoint Hit: homePage")
+func homePage(c echo.Context) {
+	c.Logger.Info("Endpoint Hit: homePage")
+	return c.String(http.StatusOK, "Welcome to the HomePage!")
 }
 
 // health endpoint handler
-func healthEndpoint(w http.ResponseWriter, r *http.Request){
-	json.NewEncoder(w).Encode(map[string]bool{"ok": true})
+func healthEndpoint(c echo.Context){
+	c.Logger.Info("Endpoint Hit: health")
+	return c.String(http.StatusOK, "Up and Running")
 }
 
 
@@ -85,7 +86,7 @@ func createNewItem(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} entity.APIError "Can not find ID"
 // @Router /items [get]
 func returnSingleItem(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	//vars := mux.Vars(r)
 	key := vars["id"]
 
 	//Check items slice for matching item
@@ -154,24 +155,24 @@ func prettyJSON(w http.ResponseWriter, list interface{}) {
 
 //HandleRequests defines all the route mappings
 func HandleRequests() {
-	// Remnants of default http handler for comparison
-	// http.HandleFunc("/", returnAllItems)
-	// log.Fatal(http.ListenAndServe(":10000", nil))
+	// Echo instance
+	e := echo.New()
 
-	// Creates a new router
-	myRouter := mux.NewRouter().StrictSlash(true)
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	// Application Operations related mappings
-	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/health", healthEndpoint)
-	myRouter.PathPrefix("/metrics").Handler(promhttp.Handler())
+	e.GET("/", homePage)
+	e.GET("/health", healthEndpoint)
+	// myRouter.PathPrefix("/metrics").Handler(promhttp.Handler())
 
-	// App functionality mappings
-	myRouter.PathPrefix("/swagger/").Handler(swagger.Handler(swagger.URL("http://localhost:10000/swagger/doc.json")))
-	myRouter.HandleFunc("/items", returnAllItems).Methods("GET")
-	myRouter.HandleFunc("/item/{id}", returnSingleItem).Methods("GET")
-	myRouter.HandleFunc("/item/{id}", deleteItem).Methods("DELETE")
-	myRouter.HandleFunc("/item", createNewItem).Methods("POST")
+	// // App functionality mappings
+	// myRouter.PathPrefix("/swagger/").Handler(swagger.Handler(swagger.URL("http://localhost:10000/swagger/doc.json")))
+	// myRouter.HandleFunc("/items", returnAllItems).Methods("GET")
+	// myRouter.HandleFunc("/item/{id}", returnSingleItem).Methods("GET")
+	// myRouter.HandleFunc("/item/{id}", deleteItem).Methods("DELETE")
+	// myRouter.HandleFunc("/item", createNewItem).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":10000", myRouter))
+	e.Logger.Fatal(e.Start(":10000"))
 }
