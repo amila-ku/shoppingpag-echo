@@ -10,7 +10,7 @@ import (
 	// blank import is for adding swagger docs
 	_ "github.com/amila-ku/shoppingpal-echo/api/docs"
 	"github.com/amila-ku/shoppingpal-echo/pkg/entity"
-	store "github.com/amila-ku/shoppingpal/pkg/store"
+	store "github.com/amila-ku/shoppingpal-echo/pkg/store"
 	"github.com/labstack/echo"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
