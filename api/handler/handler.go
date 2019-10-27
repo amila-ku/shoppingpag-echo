@@ -12,7 +12,7 @@ import (
 	"github.com/amila-ku/shoppingpal-echo/pkg/entity"
 	store "github.com/amila-ku/shoppingpal/pkg/store"
 	"github.com/labstack/echo"
-	swagger "github.com/swaggo/http-swagger"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -20,14 +20,14 @@ import (
 var ItemList = entity.NewItems()
 
 // Home page handler
-func homePage(c echo.Context) {
-	c.Logger.Info("Endpoint Hit: homePage")
+func homePage(c echo.Context) error {
+	//c.Logger.Info("Endpoint Hit: homePage")
 	return c.String(http.StatusOK, "Welcome to the HomePage!")
 }
 
 // health endpoint handler
-func healthEndpoint(c echo.Context){
-	c.Logger.Info("Endpoint Hit: health")
+func healthEndpoint(c echo.Context) error {
+	//c.Logger.Info("Endpoint Hit: health")
 	return c.String(http.StatusOK, "Up and Running")
 }
 
@@ -165,10 +165,13 @@ func HandleRequests() {
 	// Application Operations related mappings
 	e.GET("/", homePage)
 	e.GET("/health", healthEndpoint)
-	// myRouter.PathPrefix("/metrics").Handler(promhttp.Handler())
+	e.GET("/health", promhttp.Handler())
+	// myRouter.PathPrefix("/metrics").Handler()
+
+	// OpenAPI3 docs
+	e.GET("/swagger/*", echoSwagger.WrapHandle)
 
 	// // App functionality mappings
-	// myRouter.PathPrefix("/swagger/").Handler(swagger.Handler(swagger.URL("http://localhost:10000/swagger/doc.json")))
 	// myRouter.HandleFunc("/items", returnAllItems).Methods("GET")
 	// myRouter.HandleFunc("/item/{id}", returnSingleItem).Methods("GET")
 	// myRouter.HandleFunc("/item/{id}", deleteItem).Methods("DELETE")

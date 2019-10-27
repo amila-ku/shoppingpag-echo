@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"github.com/amila-ku/shoppingpal/pkg/entity"
+	"github.com/amila-ku/shoppingpal-echo/pkg/entity"
 )
 
 var region = "eu-central-1"
