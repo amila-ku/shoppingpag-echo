@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
 	"net/http"
 
@@ -15,8 +15,8 @@ import (
 	_ "github.com/amila-ku/shoppingpal-echo/api/docs"
 	"github.com/amila-ku/shoppingpal-echo/pkg/entity"
 	store "github.com/amila-ku/shoppingpal-echo/pkg/store"
-	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 // ItemList hods the list of items
@@ -34,7 +34,6 @@ func healthEndpoint(c echo.Context) error {
 	return c.String(http.StatusOK, "Up and Running")
 }
 
-
 // Add Item godoc
 // @Summary Add an Item
 // @Description add an item
@@ -48,15 +47,30 @@ func healthEndpoint(c echo.Context) error {
 // @Failure 404 {object} entity.APIError "Can not find ID"
 // @Failure 500 {object} entity.APIError "We had a problem"
 // @Router /items/ [post]
-func createNewItem(w http.ResponseWriter, r *http.Request) {
+func createNewItem(c echo.Context) error {
 	fmt.Println("Endpoint Hit: CreateNewItem")
 
 	// get the body of our POST request
 	// return the string response containing the request body
-	reqBody, _ := ioutil.ReadAll(r.Body)
-	//fmt.Fprintf(w, "%+v", string(reqBody))
+	defer c.Request().Body.Close()
+
+	// fmt.Println(c.Request().Body)
+	// reqBody, err := ioutil.ReadAll(c.Request().Body)
+	// fmt.Println(reqBody)
+	// if err != nil {
+	// 	log.Printf("Failed reading the request body for addCats: %s\n", err)
+	// 	return c.String(http.StatusInternalServerError, "")
+	// }
+
 	var itm entity.Item
-	json.Unmarshal(reqBody, &itm)
+	
+	err := json.NewDecoder(c.Request().Body).Decode(&itm)
+
+	if err != nil {
+		log.Printf("Failed processing addDog request: %s\n", err)
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	//json.Unmarshal(reqBody, &itm)
 
 	// update our global item array to include our new item
 	ItemList = append(ItemList, itm)
@@ -73,9 +87,10 @@ func createNewItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(ItemList)
-
+	return c.JSON(http.StatusOK, itm)
 
 }
+
 // List Single Item godoc
 // @Summary List Single Item
 // @Description get Item
@@ -101,7 +116,6 @@ func returnSingleItem(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, key)
 }
-
 
 // DeleteItems godoc
 // @Summary Delete Items
@@ -134,7 +148,6 @@ func deleteItem(c echo.Context) error {
 
 }
 
-
 //HandleRequests defines all the route mappings
 func HandleRequests() {
 	// Echo instance
@@ -155,6 +168,10 @@ func HandleRequests() {
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// // App functionality mappings
+	e.GET("/item/:id", returnSingleItem)
+	e.DELETE("/item/:id", deleteItem)
+	e.POST("/item", createNewItem)
+
 	// myRouter.HandleFunc("/items", returnAllItems).Methods("GET")
 	// myRouter.HandleFunc("/item/{id}", returnSingleItem).Methods("GET")
 	// myRouter.HandleFunc("/item/{id}", deleteItem).Methods("DELETE")
