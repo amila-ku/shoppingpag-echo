@@ -7,11 +7,14 @@ import (
 	"log"
 	"net/http"
 
+	//echo framework
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	// blank import is for adding swagger docs
 	_ "github.com/amila-ku/shoppingpal-echo/api/docs"
 	"github.com/amila-ku/shoppingpal-echo/pkg/entity"
 	store "github.com/amila-ku/shoppingpal-echo/pkg/store"
-	"github.com/labstack/echo"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -71,7 +74,6 @@ func createNewItem(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(ItemList)
 
-	prettyJSON(w, itm)
 
 }
 // List Single Item godoc
@@ -85,37 +87,22 @@ func createNewItem(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} entity.APIError "We need ID!!"
 // @Failure 404 {object} entity.APIError "Can not find ID"
 // @Router /items [get]
-func returnSingleItem(w http.ResponseWriter, r *http.Request) {
+func returnSingleItem(c echo.Context) error {
 	//vars := mux.Vars(r)
-	key := vars["id"]
+	key := c.Param("id")
 
 	//Check items slice for matching item
 	for _, item := range ItemList {
 
 		if item.ID == key {
-			prettyJSON(w, item)
+			//prettyJSON(w, item)
+			return c.JSON(http.StatusOK, item)
 		}
 	}
+	return c.JSON(http.StatusOK, key)
 }
-// ListALLItems godoc
-// @Summary List Items
-// @Description get Items
-// @Accept  json
-// @Produce  json
-// @Success 200 {array} entity.Item
-// @Header 200 {string} Token "qwerty"
-// @Failure 400 {object} entity.APIError "We need ID!!"
-// @Failure 404 {object} entity.APIError "Can not find ID"
-// @Router /items [get]
-func returnAllItems(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Endpoint Hit: returnAllItems")
 
-	//json.NewEncoder(w).Encode(ItemList)
 
-	// Print Json with indents, the pretty way:
-	prettyJSON(w, ItemList)
-
-}
 // DeleteItems godoc
 // @Summary Delete Items
 // @Description Delete Items
@@ -127,11 +114,13 @@ func returnAllItems(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} entity.APIError "We need ID!!"
 // @Failure 404 {object} entity.APIError "Can not find ID"
 // @Router /items/id [del]
-func deleteItem(w http.ResponseWriter, r *http.Request) {
+func deleteItem(c echo.Context) error {
 	// parse the path parameters
-	vars := mux.Vars(r)
+	// vars := mux.Vars(r)
 	// extract the `id` of the item
-	id := vars["id"]
+	// id := vars["id"]
+
+	id := c.Param("id")
 
 	//loop through all our items
 	for index, item := range ItemList {
@@ -141,17 +130,10 @@ func deleteItem(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	return c.NoContent(http.StatusNoContent)
+
 }
 
-func prettyJSON(w http.ResponseWriter, list interface{}) {
-	pretty, err := json.MarshalIndent(list, "", "    ")
-	if err != nil {
-		log.Fatal("Failed to generate json", err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(pretty)
-}
 
 //HandleRequests defines all the route mappings
 func HandleRequests() {
@@ -165,11 +147,12 @@ func HandleRequests() {
 	// Application Operations related mappings
 	e.GET("/", homePage)
 	e.GET("/health", healthEndpoint)
-	e.GET("/health", promhttp.Handler())
+	e.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+
 	// myRouter.PathPrefix("/metrics").Handler()
 
 	// OpenAPI3 docs
-	e.GET("/swagger/*", echoSwagger.WrapHandle)
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// // App functionality mappings
 	// myRouter.HandleFunc("/items", returnAllItems).Methods("GET")
