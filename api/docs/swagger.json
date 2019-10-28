@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server celler server.",
+        "description": "This is a shopping api server.",
         "title": "ShoppingPal API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
@@ -20,19 +20,19 @@
     "paths": {
         "/items": {
             "get": {
-                "description": "get Items",
+                "description": "get Item",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "List Items",
+                "summary": "List Single Item",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "name search by q",
-                        "name": "q",
+                        "description": "item search by id",
+                        "name": "id",
                         "in": "query"
                     }
                 ],
@@ -79,7 +79,7 @@
                     "application/json"
                 ],
                 "summary": "Add an Item",
-                "operationId": "get-string-by-int",
+                "operationId": "add-item",
                 "parameters": [
                     {
                         "type": "integer",
@@ -126,7 +126,8 @@
                     }
                 }
             }
-        }
+        },
+        "/items/id": {}
     },
     "definitions": {
         "entity.APIError": {

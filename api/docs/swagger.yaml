@@ -30,7 +30,7 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server celler server.
+  description: This is a shopping api server.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -42,11 +42,11 @@ paths:
     get:
       consumes:
       - application/json
-      description: get Items
+      description: get Item
       parameters:
-      - description: name search by q
+      - description: item search by id
         in: query
-        name: q
+        name: id
         type: string
       produces:
       - application/json
@@ -71,13 +71,13 @@ paths:
           schema:
             $ref: '#/definitions/entity.APIError'
             type: object
-      summary: List Items
+      summary: List Single Item
   /items/:
     post:
       consumes:
       - application/json
       description: add an item
-      operationId: get-string-by-int
+      operationId: add-item
       parameters:
       - description: Account ID
         in: path
@@ -112,6 +112,7 @@ paths:
             $ref: '#/definitions/entity.APIError'
             type: object
       summary: Add an Item
+  /items/id: {}
 securityDefinitions:
   ApiKeyAuth:
     in: header
