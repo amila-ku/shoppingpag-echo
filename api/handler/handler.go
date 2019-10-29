@@ -95,7 +95,6 @@ func createNewItem(c echo.Context) error {
 // @Failure 404 {object} entity.APIError "Can not find ID"
 // @Router /items [get]
 func returnSingleItem(c echo.Context) error {
-	//vars := mux.Vars(r)
 	key := c.Param("id")
 
 	//Check items slice for matching item
@@ -121,10 +120,6 @@ func returnSingleItem(c echo.Context) error {
 // @Failure 404 {object} entity.APIError "Can not find ID"
 // @Router /items/id [del]
 func deleteItem(c echo.Context) error {
-	// parse the path parameters
-	// vars := mux.Vars(r)
-	// extract the `id` of the item
-	// id := vars["id"]
 
 	id := c.Param("id")
 
@@ -163,11 +158,6 @@ func HandleRequests() {
 	e.GET("/item/:id", returnSingleItem)
 	e.DELETE("/item/:id", deleteItem)
 	e.POST("/item", createNewItem)
-
-	// myRouter.HandleFunc("/items", returnAllItems).Methods("GET")
-	// myRouter.HandleFunc("/item/{id}", returnSingleItem).Methods("GET")
-	// myRouter.HandleFunc("/item/{id}", deleteItem).Methods("DELETE")
-	// myRouter.HandleFunc("/item", createNewItem).Methods("POST")
 
 	e.Logger.Fatal(e.Start(":10000"))
 }
