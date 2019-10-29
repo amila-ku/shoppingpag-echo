@@ -54,14 +54,6 @@ func createNewItem(c echo.Context) error {
 	// return the string response containing the request body
 	defer c.Request().Body.Close()
 
-	// fmt.Println(c.Request().Body)
-	// reqBody, err := ioutil.ReadAll(c.Request().Body)
-	// fmt.Println(reqBody)
-	// if err != nil {
-	// 	log.Printf("Failed reading the request body for addCats: %s\n", err)
-	// 	return c.String(http.StatusInternalServerError, "")
-	// }
-
 	var itm entity.Item
 	
 	err := json.NewDecoder(c.Request().Body).Decode(&itm)
