@@ -51,39 +51,16 @@ func createNewItem(c echo.Context) error {
 	fmt.Println("Endpoint Hit: CreateNewItem")
 
 	// get the body of our POST request
-	// return the string response containing the request body
+	// close after all work is done
 	defer c.Request().Body.Close()
-
-	//var itm entity.Item
 
 	itm := new(entity.Item)
 	
-	// err := json.NewDecoder(c.Request().Body).Decode(&itm)
 
-	// if err != nil {
-	// 	log.Printf("Failed processing addDog request: %s\n", err)
-	// 	return echo.NewHTTPError(http.StatusInternalServerError)
-	// }
-
+	// bind json content to item struct
 	if err := c.Bind(itm); err != nil {
 		return err
 	}
-
-	// body, err := ioutil.ReadAll(c.Request().Body)
-
-	// if err != nil {
-	// 	log.Printf("Failed reading the request body for CreateItem: %s\n", err)
-	// 	return c.String(http.StatusInternalServerError, "")
-	// }
-
-	// // Unmarshal the response into a ExampleResponse struct
-	// fmt.Println(body)
-	// err = json.Unmarshal(body, &itm)
-	// if err != nil {
-	// 	log.Printf("Failed unmarshaling in adds: %s\n", err)
-	// 	return c.String(http.StatusInternalServerError, "")
-	// }
-	//json.Unmarshal(reqBody, &itm)
 
 	// update our global item array to include our new item
 	ItemList = append(ItemList, *itm)
